@@ -1,9 +1,11 @@
 package com.cx.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -30,8 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ForecastFragment extends Fragment {
 
@@ -58,34 +58,35 @@ public class ForecastFragment extends Fragment {
         // so long as a parent activity is specified in AndroidManifest.xml
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("94043");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String[] forecastArray = {
-                "Today - Sunny - 8/63",
-                "Tomorrow - Foggy - 70/40",
-                "Wednesday - Rainy - 72/63",
-                "Thursday - Asteroids - 75/65",
-                "Fri - Heavy Rain - 65/56",
-                "Sat - Cloudy - 60/51",
-                "Sun - Sunny - 80/687"
-        };
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
-
         mForecastAdapter = new ArrayAdapter<String>(
                         getActivity(), //context
                         R.layout.list_item_forecast, //ID of list item layout
                         R.id.list_item_forecast_textview, //ID of text view
-                        weekForecast //list of data
+                        new ArrayList<String>() //list of data
                 );
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);

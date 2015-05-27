@@ -5,4 +5,9 @@
     <string name="action_refresh" translatable="false">Refresh</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="title_activity_settings">Settings</string>
+
+    //general settings
+    <string name="pref_location_label">Location</string>
+    <string name="pref_location_key">location</string>
+    <string name="pref_location_default">530350</string>
 </resources>
